@@ -1,99 +1,74 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { AIResponse } from "../types";
 
-/**
- * Generates study content using Gemini API based on subject and prompt.
- * Optimized for speed using gemini-3-flash-preview.
- */
+// Vite bắt buộc dùng tiền tố VITE_ để nạp biến môi trường
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+
 export const generateStudyContent = async (
   subject: string,
   prompt: string,
-  image?: string // Base64 encoded string
+  image?: string 
 ): Promise<AIResponse> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  if (!API_KEY) throw new Error("API Key chưa được cấu hình trên Vercel.");
 
-  const systemInstruction = `
-    Bạn là Symbiotic AI Pro - AI Trợ lý Giáo dục Đa năng tốc độ cao cho học sinh Việt Nam.
-    Nhiệm vụ: Phân tích nội dung môn ${subject} và cung cấp phản hồi JSON chính xác tuyệt đối về mặt khoa học.
-    
-    YÊU CẦU NGHIÊM NGẶT VỀ ĐỊNH DẠNG & KHOA HỌC:
-    1. TUYỆT ĐỐI KHÔNG sử dụng dấu sao (*) trong bất kỳ trường hợp nào. 
-    2. Sử dụng xuống dòng và khoảng trắng để phân cấp thông tin. Trình bày sạch sẽ, khoa học.
-    3. Các công thức toán học, hóa học, ký hiệu vật lý phải tuân thủ quy chuẩn SGK Việt Nam.
-    4. Trình bày các bước giải logic, mạch lạc.
-    
-    Cấu trúc JSON yêu cầu:
-    {
-      "speed": {
-        "answer": "Ghi đáp án đúng ngắn gọn nhất. Không giải thích.",
-        "similar": {
-          "question": "Một câu hỏi trắc nghiệm tương tự cùng dạng bài.",
-          "options": ["Phương án A", "Phương án B", "Phương án C", "Phương án D"],
-          "correctIndex": 0
-        }
-      },
-      "socratic": "Gợi ý 2-3 bước tư duy then chốt dưới dạng câu hỏi. Không giải hộ.",
-      "notebooklm": "Hệ thống hóa lý thuyết cốt lõi bằng các đoạn văn ngắn. Xuống dòng giữa các ý.",
-      "perplexity": "Kiến thức mở rộng, ứng dụng thực tiễn hoặc các liên hệ thực tế sâu sắc.",
-      "tools": "Hướng dẫn bấm máy tính Casio 580 VNX cực kỳ chi tiết từng phím. Nếu không phải Toán, trích dẫn quy định pháp luật hoặc sự kiện lịch sử chính xác.",
-      "mermaid": "Mã Mermaid Mindmap hệ thống hóa toàn bộ kiến thức của câu hỏi. CẤU TRÚC BẮT BUỘC: mindmap\\n  root((Tên chủ đề))\\n    Ý chính 1\\n      Ý phụ 1.1\\n      Ý phụ 1.2\\n    Ý chính 2\\n      Ý phụ 2.1\\n    Ý chính 3. Lưu ý: Không dùng dấu ngoặc đơn hoặc ký tự đặc biệt trong các node ý phụ để tránh lỗi render."
-    }
-  `;
-
-  const parts: any[] = [{ text: prompt }];
-  if (image) {
-    const base64Data = image.includes(",") ? image.split(",")[1] : image;
-    parts.push({
-      inlineData: {
-        mimeType: "image/jpeg",
-        data: base64Data
-      }
-    });
-  }
-
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: { parts },
-    config: {
-      systemInstruction,
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  
+  // Sử dụng gemini-1.5-flash để đảm bảo tính ổn định và tốc độ
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: {
       responseMimeType: "application/json",
-      thinkingConfig: { thinkingBudget: 0 },
       responseSchema: {
-        type: Type.OBJECT,
+        type: SchemaType.OBJECT,
         properties: {
           speed: {
-            type: Type.OBJECT,
+            type: SchemaType.OBJECT,
             properties: {
-              answer: { type: Type.STRING },
+              answer: { type: SchemaType.STRING },
               similar: {
-                type: Type.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
-                  question: { type: Type.STRING },
-                  options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  correctIndex: { type: Type.INTEGER }
+                  question: { type: SchemaType.STRING },
+                  options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  correctIndex: { type: SchemaType.NUMBER }
                 },
                 required: ["question", "options", "correctIndex"]
               }
             },
             required: ["answer", "similar"]
           },
-          socratic: { type: Type.STRING },
-          notebooklm: { type: Type.STRING },
-          perplexity: { type: Type.STRING },
-          tools: { type: Type.STRING },
-          mermaid: { type: Type.STRING }
+          socratic: { type: SchemaType.STRING },
+          notebooklm: { type: SchemaType.STRING },
+          perplexity: { type: SchemaType.STRING },
+          tools: { type: SchemaType.STRING },
+          mermaid: { type: SchemaType.STRING }
         },
         required: ["speed", "socratic", "notebooklm", "perplexity", "tools", "mermaid"]
       }
     }
   });
 
+  const parts: any[] = [{ text: prompt }];
+  if (image) {
+    const base64Data = image.includes(",") ? image.split(",")[1] : image;
+    parts.push({
+      inlineData: { mimeType: "image/jpeg", data: base64Data }
+    });
+  }
+
   try {
-    const text = response.text || "{}";
-    return JSON.parse(text.trim()) as AIResponse;
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: `Bạn là trợ lý giáo dục Symbiotic AI Pro. Phân tích môn ${subject} và trả về JSON khoa học.` }]
+      }
+    });
+
+    return JSON.parse(result.response.text()) as AIResponse;
   } catch (error) {
-    console.error("Failed to parse Gemini response:", error);
-    throw new Error("Lỗi xử lý dữ liệu từ AI.");
+    console.error("Lỗi gọi Gemini API:", error);
+    throw new Error("Không thể kết nối với AI. Hãy kiểm tra lại API Key.");
   }
 };
