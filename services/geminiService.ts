@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import { AIResponse } from "./types";
+import { AIResponse } from "./types"; // Đã sửa lại đường dẫn ./ nếu file này nằm trong thư mục services
 
-// Vite bắt buộc dùng tiền tố VITE_ để nạp biến môi trường
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 export const generateStudyContent = async (
@@ -14,7 +13,7 @@ export const generateStudyContent = async (
 
   const genAI = new GoogleGenerativeAI(API_KEY);
   
-  // Sử dụng gemini-1.5-flash để đảm bảo tính ổn định và tốc độ
+  // THAY ĐỔI QUAN TRỌNG: Thêm { apiVersion: 'v1' } ở cuối tham số
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
     generationConfig: {
@@ -47,9 +46,10 @@ export const generateStudyContent = async (
         required: ["speed", "socratic", "notebooklm", "perplexity", "tools", "mermaid"]
       }
     }
-  });
+  }, { apiVersion: 'v1' }); // Đảm bảo dùng v1 để hỗ trợ JSON Schema ổn định
 
-  const parts: any[] = [{ text: prompt }];
+  const parts: any[] = [{ text: `Môn học: ${subject}. Nội dung: ${prompt}` }];
+  
   if (image) {
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
     parts.push({
@@ -60,15 +60,15 @@ export const generateStudyContent = async (
   try {
     const result = await model.generateContent({
       contents: [{ role: "user", parts }],
-      systemInstruction: {
-        role: "system",
-        parts: [{ text: `Bạn là trợ lý giáo dục Symbiotic AI Pro. Phân tích môn ${subject} và trả về JSON khoa học.` }]
-      }
+      // Sửa lại systemInstruction dạng chuỗi đơn giản để ổn định hơn
+      systemInstruction: "Bạn là trợ lý giáo dục Symbiotic AI Pro. Phân tích nội dung và trả về JSON khoa học theo đúng cấu trúc yêu cầu."
     });
 
-    return JSON.parse(result.response.text()) as AIResponse;
-  } catch (error) {
+    const responseText = result.response.text();
+    return JSON.parse(responseText) as AIResponse;
+  } catch (error: any) {
     console.error("Lỗi gọi Gemini API:", error);
-    throw new Error("Không thể kết nối với AI. Hãy kiểm tra lại API Key.");
+    // Nếu vẫn báo lỗi model not found, có thể do key của bạn chưa được cấp quyền v1
+    throw new Error(error.message || "Không thể kết nối với AI.");
   }
 };
