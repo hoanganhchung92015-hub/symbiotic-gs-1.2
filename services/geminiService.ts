@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import { AIResponse } from "../types";
+import { AIResponse } from "./types";
 
 // Vite bắt buộc dùng tiền tố VITE_ để nạp biến môi trường
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
