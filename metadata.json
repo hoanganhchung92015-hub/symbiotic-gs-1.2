@@ -1,0 +1,8 @@
+{
+  "name": "Symbiotic AI -  Gia sư ảo V1",
+  "description": "Ứng dụng hỗ trợ học tập đa năng tích hợp Gemini AI cho học sinh Việt Nam với các môn Toán, GDKTPL và Lịch sử.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

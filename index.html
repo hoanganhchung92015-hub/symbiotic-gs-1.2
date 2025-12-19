@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Symbiotic AI - Trợ lý Giáo dục V1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --brand-indigo: #4f46e5;
+      }
+      body { 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        letter-spacing: -0.01em;
+        background-color: #f8fafc;
+      }
+      
+      /* Typography Refinement */
+      .font-heading { font-weight: 800; letter-spacing: -0.02em; }
+      .scientific-text { 
+        font-size: 1.125rem; 
+        line-height: 1.8; 
+        color: #1e293b;
+      }
+
+      .mermaid svg { 
+        max-width: 100% !important; 
+        height: auto !important; 
+        filter: drop-shadow(0 10px 25px rgba(79, 70, 229, 0.08));
+      }
+
+      /* Custom Scrollbars Hidden */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      .grabbing { cursor: grabbing !important; scroll-behavior: auto !important; }
+
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+      /* Tab Active Glow */
+      .tab-glow {
+        box-shadow: 0 0 20px rgba(79, 70, 229, 0.2);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-[#f8fafc] text-slate-900 overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+    <script>
+      mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'neutral',
+        securityLevel: 'loose',
+        fontFamily: 'Inter',
+        mindmap: { useMaxWidth: true, padding: 40 }
+      });
+    </script>
+  </body>
+</html>
