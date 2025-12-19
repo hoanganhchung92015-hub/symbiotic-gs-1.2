@@ -13,40 +13,45 @@ export const generateStudyContent = async (
 
   const genAI = new GoogleGenerativeAI(API_KEY);
   
-  // THAY ĐỔI QUAN TRỌNG: Thêm { apiVersion: 'v1' } ở cuối tham số
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: SchemaType.OBJECT,
-        properties: {
-          speed: {
-            type: SchemaType.OBJECT,
-            properties: {
-              answer: { type: SchemaType.STRING },
-              similar: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  question: { type: SchemaType.STRING },
-                  options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                  correctIndex: { type: SchemaType.NUMBER }
-                },
-                required: ["question", "options", "correctIndex"]
-              }
-            },
-            required: ["answer", "similar"]
+  // Ép sử dụng v1beta để hỗ trợ đầy đủ responseSchema
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+}, { apiVersion: 'v1beta' }); 
+
+// Di chuyển generationConfig vào trong hàm gọi Content để tránh lỗi payload
+const result = await model.generateContent({
+  contents: [{ role: "user", parts }],
+  generationConfig: {
+    responseMimeType: "application/json",
+    responseSchema: {
+      type: SchemaType.OBJECT,
+      properties: {
+        speed: {
+          type: SchemaType.OBJECT,
+          properties: {
+            answer: { type: SchemaType.STRING },
+            similar: {
+              type: SchemaType.OBJECT,
+              properties: {
+                question: { type: SchemaType.STRING },
+                options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                correctIndex: { type: SchemaType.NUMBER }
+              },
+              required: ["question", "options", "correctIndex"]
+            }
           },
-          socratic: { type: SchemaType.STRING },
-          notebooklm: { type: SchemaType.STRING },
-          perplexity: { type: SchemaType.STRING },
-          tools: { type: SchemaType.STRING },
-          mermaid: { type: SchemaType.STRING }
+          required: ["answer", "similar"]
         },
-        required: ["speed", "socratic", "notebooklm", "perplexity", "tools", "mermaid"]
-      }
+        socratic: { type: SchemaType.STRING },
+        notebooklm: { type: SchemaType.STRING },
+        perplexity: { type: SchemaType.STRING },
+        tools: { type: SchemaType.STRING },
+        mermaid: { type: SchemaType.STRING }
+      },
+      required: ["speed", "socratic", "notebooklm", "perplexity", "tools", "mermaid"]
     }
-  }, { apiVersion: 'v1' }); // Đảm bảo dùng v1 để hỗ trợ JSON Schema ổn định
+  }
+});
 
   const parts: any[] = [{ text: `Môn học: ${subject}. Nội dung: ${prompt}` }];
   
