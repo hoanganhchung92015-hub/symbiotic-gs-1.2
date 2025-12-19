@@ -247,6 +247,8 @@ const App: React.FC = () => {
 
                 <div className="space-y-8">
                   <textarea
+                    id="study-input"      // <--- Thêm dòng này
+                    name="study-input"    // <--- Thêm dòng này
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Nhập câu hỏi hoặc mô tả bài tập..."
@@ -483,6 +485,21 @@ const App: React.FC = () => {
             <div className="max-w-4xl mx-auto flex items-center gap-6">
               <div className="flex-1 relative group">
                 <input 
+                  // Trước khi sửa:
+<input 
+  type="text" 
+  placeholder="Hỏi AI thêm về nội dung bài học này..." 
+  className="..."
+/>
+
+// Sau khi thêm (Dòng ~370):
+<input 
+  id="follow-up-question"  // <--- Thêm dòng này
+  name="follow-up-question" // <--- Thêm dòng này
+  type="text" 
+  placeholder="Hỏi AI thêm về nội dung bài học này..." 
+  className="w-full py-6 px-10 bg-slate-100 rounded-full text-lg font-bold placeholder:text-slate-400 focus:outline-none focus:ring-8 focus:ring-indigo-500/10 border-2 border-transparent focus:border-indigo-500/20 shadow-inner transition-all group-hover:bg-slate-200/50"
+/>
                   type="text" 
                   placeholder="Hỏi AI thêm về nội dung bài học này..." 
                   className="w-full py-6 px-10 bg-slate-100 rounded-full text-lg font-bold placeholder:text-slate-400 focus:outline-none focus:ring-8 focus:ring-indigo-500/10 border-2 border-transparent focus:border-indigo-500/20 shadow-inner transition-all group-hover:bg-slate-200/50"
