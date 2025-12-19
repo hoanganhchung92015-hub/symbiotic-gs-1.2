@@ -57,18 +57,23 @@ export const generateStudyContent = async (
     });
   }
 
-  try {
+ try {
+    // CÁCH VIẾT MỚI: Truyền thẳng đối tượng chứa nội dung
     const result = await model.generateContent({
-      contents: [{ role: "user", parts }],
-      // Sửa lại systemInstruction dạng chuỗi đơn giản để ổn định hơn
-      systemInstruction: "Bạn là trợ lý giáo dục Symbiotic AI Pro. Phân tích nội dung và trả về JSON khoa học theo đúng cấu trúc yêu cầu."
+      contents: [{ 
+        role: "user", 
+        parts: parts 
+      }]
+      // Lưu ý: Bỏ systemInstruction ở đây nếu bạn đã khai báo nó 
+      // lúc khởi tạo model (getGenerativeModel) phía trên.
     });
 
-    const responseText = result.response.text();
-    return JSON.parse(responseText) as AIResponse;
+    const response = await result.response;
+    const text = response.text();
+    return JSON.parse(text) as AIResponse;
+
   } catch (error: any) {
     console.error("Lỗi gọi Gemini API:", error);
-    // Nếu vẫn báo lỗi model not found, có thể do key của bạn chưa được cấp quyền v1
-    throw new Error(error.message || "Không thể kết nối với AI.");
+    throw new Error("Không thể kết nối với AI. Hãy kiểm tra lại API Key.");
   }
 };
