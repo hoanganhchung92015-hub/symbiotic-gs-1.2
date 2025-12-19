@@ -134,9 +134,14 @@ const App: React.FC = () => {
       setShowResult(true);
       setSelectedOption(null);
       setShowMcqAnswer(false);
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi kết nối với Symbiotic AI.");
-    } finally {
+    // Sửa lại đoạn catch trong App.tsx để kiểm tra lỗi dễ hơn
+} catch (error: any) {
+  console.error("Chi tiết lỗi:", error);
+  // Hiển thị thông báo cụ thể hơn để biết lỗi do Key hay do Code
+  const errorMessage = error.message || "Lỗi không xác định";
+  alert(`Symbiotic AI báo lỗi: ${errorMessage}`);
+} finally {
+    
       setIsAiLoading(false);
     }
   };
