@@ -492,11 +492,14 @@ const App: React.FC = () => {
                 <input 
                   // Trước khi sửa:
 <input 
+  id="ai-query-footer"        // Thêm ID duy nhất
+  name="ai-query-footer"      // Thêm Name tương ứng
   type="text" 
+  value={inputText}           // Kết nối với State của bạn
+  onChange={(e) => setInputText(e.target.value)} // Cập nhật nội dung khi gõ
   placeholder="Hỏi AI thêm về nội dung bài học này..." 
   className="..."
 />
-
 // Sau khi thêm (Dòng ~370):
 <input 
   id="follow-up-question"  // <--- Thêm dòng này
